@@ -33,11 +33,12 @@ class AutoPlayer():
         gamestate.print_block_tiles()
 
     def shrewd_next_move(self, gamestate):
+        """ violently search the best strategy """
         shrewd_move = 0
         judge_result = 0
         for virtual_rotate in range(4):
             for virtual_move_direction in [0,1,-1]:
-                for virtual_move in range(MAXCOL):
+                for virtual_move in range(MAXCOL // 2):
                     landed = False
                     virtual_game = gamestate.clone(True)
                     for i in range(virtual_rotate):
@@ -74,17 +75,17 @@ class AutoPlayer():
             gamestate.move(Direction.LEFT)
 
 def judge(gamestate):
+    """ make judgement on the landed tiles """
     tiles = gamestate.get_tiles()
     judge = 10 * gamestate.get_score()
-    num = 0
     for y in range(1,MAXROW):
         for x in range(MAXCOL):
             if not tiles[y][x] and tiles[y - 1][x]:
-                judge -= 100
+                judge -= 75
     for y in range(MAXROW):
         for x in range(MAXCOL):
             if tiles[y][x]:
-                num += y
+                judge += 5 * y
                 if x != MAXCOL - 1 and tiles[y][x + 1]:
                     judge += 1
                 if y != MAXROW - 1 and tiles[y + 1][x]:
@@ -97,4 +98,4 @@ def judge(gamestate):
     for x in range(MAXCOL):
         if tiles[MAXROW - 1][x]:
             judge += 1
-    return (judge + num * 5)
+    return judge
